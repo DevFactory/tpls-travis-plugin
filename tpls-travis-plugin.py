@@ -7,6 +7,7 @@ import os
 import sys
 import subprocess
 import time
+import tempfile
 
 logging.basicConfig(filename='devfactory-travis.log', level=logging.DEBUG)
 PLUGIN_NAME = "Devfactory Dependency Analyser"
@@ -37,17 +38,21 @@ RESPONSE_FAILURE_MESSAGE = 'FAILURE'
 RESPONSE_STATUS_KEY = 'status'
 TOTAL_PLUGIN_TIMEOUT = 600
 POST_REQUEST_RETRY_TIMEOUT = 10
-START_POLLING_TIMEOUT = 20  # Wait 30 seconds before starting polling for results
-RESULT_RETRY_TIMEOUT = 10  # Wait 30 seconds between api polling for results
+START_POLLING_TIMEOUT = 20
+RESULT_RETRY_TIMEOUT = 10
 
 def _get_dependency_list():
-    list_command = "mvn dependency:list -DincludeScope=runtime > df_list_output.txt"
-    command = "cat df_list_output.txt | sed -ne s/..........// -e /patterntoexclude/d -e s/:compile//p -e s/:runtime//p | sort | uniq"
+    temp_file = tempfile.mkstemp('.txt')[1]
+    list_command = "mvn dependency:list -DincludeScope=runtime > %s" % temp_file
+    command = "cat %s | sed -ne s/..........// -e /patterntoexclude/d -e s/:compile//p -e s/:runtime//p | sort | uniq" \
+              % temp_file
+
     # Getting list of dependencies using Maven
     subprocess.check_output(list_command, shell=True)
     output = subprocess.check_output(command, shell=True)
-    dependency_list = output.split("\n")
+    dependency_list = output.splitlines()
     dependencies = [':'.join(dependency.split(':')[:2] + [dependency.split(':')[-1]]) for dependency in dependency_list if dependency]
+    os.remove(temp_file)
     return dependencies
 
 def _get_dependencies():
