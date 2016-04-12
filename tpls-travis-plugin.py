@@ -12,6 +12,7 @@ import tempfile
 logging.basicConfig(filename='devfactory-travis.log', level=logging.DEBUG)
 PLUGIN_NAME = "Devfactory Dependency Analyser"
 LOGGER_NAME = 'DEVFACTORY_LOGGER'
+GIT_BRANCH_COMMAND = 'git rev-parse --abbrev-ref HEAD'
 
 logger = logging.getLogger(LOGGER_NAME)
 output_handler = logging.StreamHandler(sys.stdout)
@@ -79,9 +80,10 @@ def _get_post_data(dependencies):
     post_data['modules'] = modules
     post_data['ci_system'] = "travis"
     post_data['protocol'] = "LIST"
-    post_data['product_version_id'] = os.environ.get("TRAVIS_JOB_ID")
-    post_data['build_id'] = os.environ.get("TRAVIS_BUILD_ID")
     post_data['product_id'] = os.environ.get("TRAVIS_REPO_SLUG")
+    post_data['product_version_id'] = subprocess.check_output(GIT_BRANCH_COMMAND, shell=True).strip()
+    post_data['product_name'] = os.environ.get("TRAVIS_JOB_ID")
+    post_data['build_id'] = os.environ.get("TRAVIS_BUILD_ID")    
     post_data['scm_type'] = 'git'
     return post_data
 
