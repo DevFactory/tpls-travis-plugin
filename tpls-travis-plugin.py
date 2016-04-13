@@ -47,9 +47,8 @@ def _get_dependency_list():
     list_command = "mvn dependency:list -DoutputFile=%s" % temp_file
     # Getting list of dependencies using Maven
     subprocess.check_output(list_command, shell=True)
-    output_file = open(temp_file, 'r')
     dependencies = []
-    if output_file:
+    with open(temp_file, 'r') as output_file:
         for dependency in output_file.readlines()[2:]:
             if dependency.strip():
                 logger.info(dependency.strip())
@@ -57,8 +56,8 @@ def _get_dependency_list():
                 if dependency_gav and len(dependency_gav) > 2 and dependency_gav[1] != 'test':
                     dependencies.append(dependency_gav[0])
     logger.info("Dependencies found, Closing file")
-    output_file.close()
     os.remove(temp_file)
+    logger.info("File has been deleted")
     return dependencies
 
 def _get_dependencies():
