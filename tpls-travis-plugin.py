@@ -54,8 +54,9 @@ def _get_dependency_list():
             if dependency.strip():
                 logger.info(dependency.strip())
                 dependency_gav = dependency.strip().rsplit(':', 1)
-                if len(dependency_gav) > 2 and dependency_gav[1] != 'test':
+                if dependency_gav and len(dependency_gav) > 2 and dependency_gav[1] != 'test':
                     dependencies.append(dependency_gav[0])
+    logger.info("Dependencies found, Closing file")
     output_file.close()
     os.remove(temp_file)
     return dependencies
