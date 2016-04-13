@@ -51,9 +51,10 @@ def _get_dependency_list():
     with open(temp_file, 'r') as output_file:
         for dependency in output_file.readlines()[2:]:
             if dependency.strip():
-                logger.info(dependency.strip())
                 dependency_gav = dependency.strip().rsplit(':', 1)
-                if dependency_gav and len(dependency_gav) > 2 and dependency_gav[1] != 'test':
+                logger.info(dependency_gav)
+                if dependency_gav and len(dependency_gav) >= 2 and dependency_gav[1] != 'test':
+
                     dependencies.append(dependency_gav[0])
     logger.info("Dependencies found, Closing file")
     os.remove(temp_file)
@@ -79,6 +80,7 @@ def _get_dependencies():
 
 def _get_post_data(dependencies):
     # Create data for POST request
+    logger.info("Creating Post data")
     modules = [dict(name=None, lib_path=None, source_path=None, bin_path=None, gav_list=dependencies)]
     post_data = {}
     post_data['modules'] = modules
@@ -89,6 +91,7 @@ def _get_post_data(dependencies):
     post_data['product_name'] = os.environ.get("TRAVIS_REPO_SLUG")
     post_data['build_id'] = os.environ.get("TRAVIS_BUILD_ID")
     post_data['scm_type'] = 'git'
+    logger.info("Post data has been created successfully")
     return post_data
 
 def _get_response_data(config):
@@ -155,6 +158,8 @@ def process():
     try:
         start_time = datetime.now()
         dependencies = _get_dependencies()
+        logger.info("Found dependencies, They are:")
+        logger.info(dependencies)
         if dependencies:
             post_data = _get_post_data(dependencies)
             logger.info("Successfully found dependencies for Analysis. Sending dependencies to server for processing")
