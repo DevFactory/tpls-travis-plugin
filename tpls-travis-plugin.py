@@ -12,7 +12,7 @@ import tempfile
 logging.basicConfig(filename='devfactory-travis.log', level=logging.DEBUG)
 PLUGIN_NAME = "Devfactory Dependency Analyser"
 LOGGER_NAME = 'DEVFACTORY_LOGGER'
-GIT_BRANCH_COMMAND = 'git rev-parse --abbrev-ref HEAD'
+GIT_BRANCH_COMMAND = 'git name-rev --name-only HEAD'
 
 logger = logging.getLogger(LOGGER_NAME)
 output_handler = logging.StreamHandler(sys.stdout)
