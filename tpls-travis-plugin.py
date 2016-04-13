@@ -44,10 +44,13 @@ RESULT_RETRY_TIMEOUT = 10
 
 def _get_dependency_list():
     temp_file = tempfile.mkstemp('.txt')[1]
+    logger.info("Temp file created")
     list_command = "mvn dependency:list -DoutputFile=%s" % temp_file
     # Getting list of dependencies using Maven
     subprocess.check_output(list_command, shell=True)
+    logger.info("List command executed")
     output_file = open(temp_file, 'r')
+    logger.info("File opened")
     dependencies = []
     if output_file:
         for dependency in output_file.readlines()[2:]:
@@ -187,7 +190,7 @@ def process():
                     break
                 time.sleep(RESULT_RETRY_TIMEOUT)
         else:
-            logger.info("Failed to get list of dependencies for the project")
+            logger.exception("Failed to get list of dependencies for the project")
         return True
     except subprocess.CalledProcessError:
         logger.exception("Error in subprocess")
