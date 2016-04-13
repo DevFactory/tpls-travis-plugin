@@ -82,8 +82,8 @@ def _get_post_data(dependencies):
     post_data['protocol'] = "LIST"
     post_data['product_id'] = os.environ.get("TRAVIS_REPO_SLUG")
     post_data['product_version_id'] = subprocess.check_output(GIT_BRANCH_COMMAND, shell=True).strip()
-    post_data['product_name'] = os.environ.get("TRAVIS_JOB_ID")
-    post_data['build_id'] = os.environ.get("TRAVIS_BUILD_ID")    
+    post_data['product_name'] = os.environ.get("TRAVIS_REPO_SLUG")
+    post_data['build_id'] = os.environ.get("TRAVIS_BUILD_ID")
     post_data['scm_type'] = 'git'
     return post_data
 
