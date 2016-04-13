@@ -44,16 +44,16 @@ RESULT_RETRY_TIMEOUT = 10
 
 def _get_dependency_list():
     temp_file = tempfile.mkstemp('.txt')[1]
-    list_command = "mvn dependency:list -DincludeScope=runtime > %s" % temp_file
-    command = "cat %s | sed -ne s/..........// -e /patterntoexclude/d -e s/:compile//p -e s/:runtime//p | sort | uniq" \
-              % temp_file
-
+    list_command = "mvn dependency:list -DoutputFile=%s" % temp_file
     # Getting list of dependencies using Maven
     subprocess.check_output(list_command, shell=True)
-    output = subprocess.check_output(command, shell=True)
-    dependency_list = output.splitlines()
-    dependencies = [':'.join(dependency.split(':')[:2] + [dependency.split(':')[-1]]) for dependency in dependency_list if dependency]
+    output_file = open(temp_file, 'r')
+    dependencies = None
+    if output_file:
+        dependencies = [dependency.strip().rsplit(':', 1)
+                        for dependency in output_file.readlines()[2:] if dependency]
     os.remove(temp_file)
+    output_file.close()
     return dependencies
 
 def _get_dependencies():
