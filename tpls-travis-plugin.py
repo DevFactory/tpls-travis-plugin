@@ -48,10 +48,12 @@ def _get_dependency_list():
     # Getting list of dependencies using Maven
     subprocess.check_output(list_command, shell=True)
     output_file = open(temp_file, 'r')
-    dependencies = None
+    dependencies = []
     if output_file:
-        dependencies = [dependency.strip().rsplit(':', 1)
-                        for dependency in output_file.readlines()[2:] if dependency]
+        for dependency in output_file.readlines()[2:]:
+            dependency_gav = dependency.strip().rsplit(':', 1)
+            if len(dependency_gav) > 2 and dependency_gav[1] != 'test':
+                dependencies.append(dependency_gav[0])
     os.remove(temp_file)
     output_file.close()
     return dependencies
