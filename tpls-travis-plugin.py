@@ -60,7 +60,7 @@ def _get_dependency_list():
     logger.info("Dependencies found, Closing file")
     os.remove(temp_file)
     logger.info("File has been deleted")
-    return dependencies
+    return list(dependencies)
 
 def _get_dependencies():
     try:
