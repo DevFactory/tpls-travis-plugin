@@ -29,7 +29,7 @@ import urllib2
 
 install_command = os.environ.get('DF_INSTALL_COMMAND')
 DEFAULT_INSTALL_COMMAND = 'mvn install -DskipTests'
-BASE_URL = "http://aline-cnu-apielast-1qrfta1b7d7r3-412496036.us-east-1.elb.amazonaws.com"
+BASE_URL = "http://cnu-docke-elasticl-xjzf01araa83-1708185895.us-east-1.elb.amazonaws.com"
 
 POST_API_URL = BASE_URL + '/api/jobs'
 POLL_API_URL = BASE_URL + '/api/jobs/%d/summary'  # Add job_id parameter
@@ -44,10 +44,11 @@ RESULT_RETRY_TIMEOUT = 10
 
 def _get_dependency_list():
     temp_file = tempfile.mkstemp('.txt')[1]
-    list_command = "mvn dependency:list -DoutputFile=%s" % temp_file
+    list_command = "mvn org.apache.maven.plugins:maven-dependency-plugin:2.6:list -DoutputFile=%s -DappendOutput=true" \
+                   % temp_file
     # Getting list of dependencies using Maven
     subprocess.check_output(list_command, shell=True)
-    dependencies = []
+    dependencies = set()
     with open(temp_file, 'r') as output_file:
         for dependency in output_file.readlines()[2:]:
             if dependency.strip():
@@ -55,7 +56,7 @@ def _get_dependency_list():
                 logger.info(dependency_gav)
                 if dependency_gav and len(dependency_gav) >= 2 and dependency_gav[1] != 'test':
                     split_deps = dependency_gav[0].split(':')
-                    dependencies.append(':'.join(split_deps[:2] + [split_deps[-1]]))
+                    dependencies.add(':'.join(split_deps[:2] + [split_deps[-1]]))
     logger.info("Dependencies found, Closing file")
     os.remove(temp_file)
     logger.info("File has been deleted")
