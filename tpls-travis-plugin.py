@@ -50,13 +50,11 @@ def _get_dependency_list():
     subprocess.check_output(list_command, shell=True)
     dependencies = set()
     with open(temp_file, 'r') as output_file:
-        for dependency in output_file.readlines()[2:]:
-            if dependency.strip():
-                dependency_gav = dependency.strip().rsplit(':', 1)
-                logger.info(dependency_gav)
-                if dependency_gav and len(dependency_gav) >= 2 and dependency_gav[1] != 'test':
-                    split_deps = dependency_gav[0].split(':')
-                    dependencies.add(':'.join(split_deps[:2] + [split_deps[-1]]))
+        for dependency in output_file.readlines():
+            dependency_gav = dependency.strip().split(':', 1)
+            logger.info(dependency_gav)
+            if dependency_gav and len(dependency_gav) >= 5 and dependency_gav[-1] != 'test':
+                dependencies.add(':'.join(dependency_gav[:2] + [dependency_gav[-2]]))
     logger.info("Dependencies found, Closing file")
     os.remove(temp_file)
     logger.info("File has been deleted")
