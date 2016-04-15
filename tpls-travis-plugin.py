@@ -51,7 +51,7 @@ def _get_dependency_list():
     dependencies = set()
     with open(temp_file, 'r') as output_file:
         for dependency in output_file.readlines():
-            dependency_gav = dependency.strip().split(':', 1)
+            dependency_gav = dependency.strip().split(':')
             logger.info(dependency_gav)
             if dependency_gav and len(dependency_gav) >= 5 and dependency_gav[-1] != 'test':
                 dependencies.add(':'.join(dependency_gav[:2] + [dependency_gav[-2]]))
